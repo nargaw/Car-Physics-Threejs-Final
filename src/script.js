@@ -14,9 +14,9 @@ class Scene{
     }
     
     _Init(){
-        this.stats = new Stats()
-        this.stats.showPanel(0)
-        document.body.appendChild(this.stats.dom)
+        //this.stats = new Stats()
+        //this.stats.showPanel(0)
+        //document.body.appendChild(this.stats.dom)
         this.scene = new THREE.Scene()
         this.clock = new THREE.Clock()
         this.oldElapsedTime = 0
@@ -25,7 +25,6 @@ class Scene{
         this.mouse = new THREE.Vector2()
         this.distance = new THREE.Vector2()
         this.InitPhysics()
-        //this.InitPhysic
         this.InitFireFlies()
         this.InitEnv()
         this.InitCamera()
@@ -414,7 +413,7 @@ class Scene{
     Update(){
         setTimeout(() => {
             requestAnimationFrame(() => {
-                this.stats.begin()
+               //this.stats.begin()
                 this.firefliesMaterial.uniforms.u_time.value = this.oldElapsedTime
                 this.elapsedTime = this.clock.getElapsedTime()
                 this.deltaTime = this.elapsedTime - this.oldElapsedTime
@@ -498,7 +497,7 @@ class Scene{
                 
                 //this.controls.update()
                 //console.log(this.mouse.x, this.mouse.y)
-                this.stats.end()
+                //this.stats.end()
                 this.Update()
             }) 
 
