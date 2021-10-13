@@ -102,8 +102,8 @@ html, body{
 
   .left{
     position: absolute;
-    margin-left: -100px;
-    margin-bottom: 0px;
+    margin-left: -125px;
+    margin-bottom: 40px;
   }
 
   .right {
