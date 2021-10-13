@@ -4,6 +4,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as CANNON from 'cannon-es'
 import cannonDebugger from 'cannon-es-debugger'
 import Stats from 'stats.js'
+import vertex from './shader/vertex.glsl'
+import fragment from './shader/fragment.glsl'
 const canvas = document.querySelector('.webgl')
 
 class Scene{
@@ -23,7 +25,8 @@ class Scene{
         this.mouse = new THREE.Vector2()
         this.distance = new THREE.Vector2()
         this.InitPhysics()
-        //this.InitPhysicsDebugger()
+        //this.InitPhysic
+        this.InitFireFlies()
         this.InitEnv()
         this.InitCamera()
         this.InitBuildingCreator()
@@ -108,7 +111,7 @@ class Scene{
     }
 
     InitEnv(){
-        this.fog = new THREE.FogExp2(0x191919, 0.009)
+        this.fog = new THREE.FogExp2(0x191919, 0.001)
         this.scene.fog = this.fog
         this.geometry = new THREE.PlaneBufferGeometry(1000, 1000, 2, 2)
         this.material = new THREE.MeshStandardMaterial({
@@ -129,6 +132,37 @@ class Scene{
         this.world.addBody(this.groundBody)
         this.groundBody.addShape(new CANNON.Plane())
         this.groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
+    }
+
+    InitFireFlies(){
+        this.firefliesGeometry = new THREE.BufferGeometry()
+        this.firefliesCount = 100000
+        this.positionArray = new Float32Array(this.firefliesCount * 3)
+        this.scaleArray = new Float32Array(this.firefliesCount)
+        for(let i = 0; i < this.firefliesCount; i++){
+            this.positionArray[i * 3 + 0] = (Math.random() - 0.5) * 1000
+            this.positionArray[i * 3 + 1] = (Math.random()) * 1000
+            this.positionArray[i * 3 + 2] = (Math.random() - 0.5) * 1000
+
+            this.scaleArray[i] = Math.random()
+        }
+        this.firefliesGeometry.setAttribute('position', new THREE.BufferAttribute(this.positionArray, 3))
+        this.firefliesGeometry.setAttribute('aScale', new THREE.BufferAttribute(this.scaleArray, 1))
+
+        this.firefliesMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                u_time: { value: 0},
+                u_pixelRatio: { value: Math.min(window.devicePixelRatio, 2)},
+                u_size: { value: 1000 }
+            },
+            vertexShader: vertex,
+            fragmentShader: fragment,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        })
+        this.fireflies = new THREE.Points(this.firefliesGeometry, this.firefliesMaterial)
+        this.scene.add(this.fireflies)
     }
 
     InitBuildingCreator(){
@@ -330,6 +364,7 @@ class Scene{
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         this.renderer.setSize(window.innerWidth, window.innerHeight)
         this.renderer.render(this.scene, this.camera)
+        this.firefliesMaterial.uniforms.u_pixelRatio.value = Math.min(window.devicePixelRatio, 2)
     }
 
     InitCamera(){
@@ -380,6 +415,7 @@ class Scene{
         setTimeout(() => {
             requestAnimationFrame(() => {
                 this.stats.begin()
+                this.firefliesMaterial.uniforms.u_time.value = this.oldElapsedTime
                 this.elapsedTime = this.clock.getElapsedTime()
                 this.deltaTime = this.elapsedTime - this.oldElapsedTime
                 this.oldElapsedTime = this.elapsedTime
