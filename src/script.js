@@ -14,9 +14,9 @@ class Scene{
     }
     
     _Init(){
-        //this.stats = new Stats()
-        //this.stats.showPanel(0)
-        //document.body.appendChild(this.stats.dom)
+        this.stats = new Stats()
+        this.stats.showPanel(0)
+        document.body.appendChild(this.stats.dom)
         this.scene = new THREE.Scene()
         this.clock = new THREE.Clock()
         this.oldElapsedTime = 0
@@ -348,8 +348,8 @@ class Scene{
 
         this.constraintBL.enableMotor()
         this.constraintBR.enableMotor()
-        this.constraintFL.enableMotor()
-        this.constraintFR.enableMotor()
+        //this.constraintFL.enableMotor()
+        //this.constraintFR.enableMotor()
     }
         
     InitRenderer(){
@@ -381,12 +381,12 @@ class Scene{
     InitLights(){
         this.ambientLight = new THREE.AmbientLight(0xffffff, 0.1)
         this.scene.add(this.ambientLight)
-        this.pointLight = new THREE.PointLight(0xffffff, 0.8)
+        this.pointLight = new THREE.PointLight(0xffffff, 1.2)
         this.scene.add(this.pointLight)
         this.pointLight.position.set(20, 50, 20)
         this.pointLight.castShadow = true
-        this.pointLight.shadow.mapSize.width = 512;
-        this.pointLight.shadow.mapSize.height = 512;
+        this.pointLight.shadow.mapSize.width = 1024;
+        this.pointLight.shadow.mapSize.height = 1024;
         this.pointLightHelper = new THREE.PointLightHelper(this.pointLight, 0.3, 0xff0000)
         this.scene.add(this.pointLightHelper)
 
@@ -411,99 +411,99 @@ class Scene{
     }
 
     Update(){
-        setTimeout(() => {
-            requestAnimationFrame(() => {
-               //this.stats.begin()
-                this.firefliesMaterial.uniforms.u_time.value = this.oldElapsedTime
-                this.elapsedTime = this.clock.getElapsedTime()
-                this.deltaTime = this.elapsedTime - this.oldElapsedTime
-                this.oldElapsedTime = this.elapsedTime
-                this.world.step(1/60, this.deltaTime, 3)
-    
-                this.camera.lookAt(this.group.position)
-    
-                this.chaseCamPivot.getWorldPosition(this.v)
-                if (this.v.y < 1){
-                    this.v.y = 1
-                }
-                this.camera.position.lerpVectors(this.camera.position, this.v, 0.1)
-    
-                for(this.object of this.objectsToUpdate){
-                    this.object.mesh.position.copy(this.object.body.position)
-                    this.object.mesh.quaternion.copy(this.object.body.quaternion)
-                }
-                this.thrusting = false
-                
-                
-                if (this.keyMap['w'] || this.hoverMap['3']  || this.hoverTouch['3']|| this.keyMap['ArrowUp']){
-                    if(this.forwardVel < 45.0){
-                        this.forwardVel += 1
-                        this.thrusting = true
-                    } 
-                }
-    
-                if (this.keyMap['s'] || this.hoverMap['4'] || this.hoverTouch['4'] || this.keyMap['ArrowDown']){
-                    if(this.forwardVel > -35.0){
-                        this.forwardVel -= 1
-                        this.thrusting = true 
-                    } 
-                }
-    
-                if (this.keyMap['a'] || this.hoverMap['1'] || this.hoverTouch['1']|| this.keyMap['ArrowLeft']){
-                    if(this.rightVel > -0.5){
-                       // this.forwardVel += 0.5
-                       // this.thrusting = true
-                        this.rightVel -= 0.025
-                    } 
-                }
-    
-                if (this.keyMap['d'] || this.hoverMap['2'] || this.hoverTouch['2']|| this.keyMap['ArrowRight']){
-                    if(this.rightVel < 0.5){
-                        //this.forwardVel += 0.5
-                       // this.thrusting = true
-                        this.rightVel += 0.025
-                    } 
-                }
-                if (this.keyMap[' ']){
-                    if(this.forwardVel > 0){
-                        this.forwardVel -= 1
-                    }
-                    if(this.forwardVel < 0){
-                        this.forwardVel += 1
-                    }
-                }
-    
-                if (!this.thrusting || !this.getPos){
-                    if (this.forwardVel > 0){
-                        this.forwardVel -= 0.25
-                    }
-                    if(this.forwardVel < 0){
-                        this.forwardVel += 0.25
-                    }
-                    if(this.rightVel > 0){
-                        this.rightVel -= 0.01
-                    }
-                    if(this.rightVel < 0){
-                        this.rightVel += 0.01
-                    }
-                }
-    
-                this.constraintBL.setMotorSpeed(this.forwardVel)
-                this.constraintBR.setMotorSpeed(this.forwardVel)
-                this.constraintFL.setMotorSpeed(this.forwardVel)
-                this.constraintFR.setMotorSpeed(this.forwardVel)
-                this.constraintFL.axisA.z = this.rightVel
-                this.constraintFR.axisA.z = this.rightVel
-                
-                //this.controls.update()
-                //console.log(this.mouse.x, this.mouse.y)
-                //this.stats.end()
-                this.Update()
-            }) 
+        
+        requestAnimationFrame(() => {
+            //console.time()
+            this.stats.begin()
+            this.firefliesMaterial.uniforms.u_time.value = this.oldElapsedTime
+            this.elapsedTime = this.clock.getElapsedTime()
+            this.deltaTime = this.elapsedTime - this.oldElapsedTime
+            this.oldElapsedTime = this.elapsedTime
+            this.world.step(1/60, this.oldElapsedTime, 3)
 
-        }, 1000/60);
-        this.renderer.render(this.scene, this.camera)
-         
+            this.camera.lookAt(this.group.position)
+
+            this.chaseCamPivot.getWorldPosition(this.v)
+            if (this.v.y < 1){
+                this.v.y = 1
+            }
+            this.camera.position.lerpVectors(this.camera.position, this.v, 0.1)
+
+            for(this.object of this.objectsToUpdate){
+                this.object.mesh.position.copy(this.object.body.position)
+                this.object.mesh.quaternion.copy(this.object.body.quaternion)
+            }
+            this.thrusting = false
+            
+            
+            if (this.keyMap['w'] || this.hoverMap['3']  || this.hoverTouch['3']|| this.keyMap['ArrowUp']){
+                if(this.forwardVel < 12.5){
+                    this.forwardVel += 0.5
+                    this.thrusting = true
+                } 
+            }
+
+            if (this.keyMap['s'] || this.hoverMap['4'] || this.hoverTouch['4'] || this.keyMap['ArrowDown']){
+                if(this.forwardVel > -5.0){
+                    this.forwardVel -= 1
+                    this.thrusting = true 
+                } 
+            }
+
+            if (this.keyMap['a'] || this.hoverMap['1'] || this.hoverTouch['1']|| this.keyMap['ArrowLeft']){
+                if(this.rightVel > -0.5){
+                    // this.forwardVel += 0.5
+                    // this.thrusting = true
+                    this.rightVel -= 0.025
+                } 
+            }
+
+            if (this.keyMap['d'] || this.hoverMap['2'] || this.hoverTouch['2']|| this.keyMap['ArrowRight']){
+                if(this.rightVel < 0.5){
+                    //this.forwardVel += 0.5
+                    // this.thrusting = true
+                    this.rightVel += 0.025
+                } 
+            }
+            if (this.keyMap[' ']){
+                if(this.forwardVel > 0){
+                    this.forwardVel -= 1
+                }
+                if(this.forwardVel < 0){
+                    this.forwardVel += 1
+                }
+            }
+
+            if (!this.thrusting || !this.getPos){
+                if (this.forwardVel > 0){
+                    this.forwardVel -= 0.25
+                }
+                if(this.forwardVel < 0){
+                    this.forwardVel += 0.25
+                }
+                if(this.rightVel > 0){
+                    this.rightVel -= 0.01
+                }
+                if(this.rightVel < 0){
+                    this.rightVel += 0.01
+                }
+            }
+
+            this.constraintBL.setMotorSpeed(this.forwardVel)
+            this.constraintBR.setMotorSpeed(this.forwardVel)
+            //this.constraintFL.setMotorSpeed(this.forwardVel)
+            //this.constraintFR.setMotorSpeed(this.forwardVel)
+            this.constraintFL.axisA.z = this.rightVel
+            this.constraintFR.axisA.z = this.rightVel
+            
+            //this.controls.update()
+            //console.log(this.mouse.x, this.mouse.y)
+            this.stats.end()
+            this.renderer.render(this.scene, this.camera)
+            //console.timeEnd()
+            this.Update()
+            
+        }) 
     }
 }
 
